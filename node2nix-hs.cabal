@@ -19,6 +19,8 @@ tested-with:         GHC == 9.0.2
 common common-options
   build-depends:       base ^>= 4.16.4.0
                      , relude
+                     , hnix
+                     , serialise
 
   mixins:              base hiding (Prelude)
                      , relude (Relude as Prelude)

@@ -1,7 +1,8 @@
-module Main (main) where
+module Main
+  ( main
+  ) where
 
-import Node2nixHs (projectName)
-
+import           Node2nixHs (projectName)
 
 main :: IO ()
 main = putStrLn ("Tests for " ++ projectName)

@@ -19,10 +19,8 @@
           );
 
       forEachSystems = flake-utils.lib.eachDefaultSystem (system:
-        let config = { };
-
-            pkgs =
-              import nixpkgs { inherit config system; overlays = [ haskellOverlay ]; };
+        let pkgs =
+              import nixpkgs { inherit system; overlays = [ haskellOverlay ]; };
 
             previous-pkgs = import previous { inherit system; };
             lint = previous-pkgs.callPackage ./lint.nix {};
@@ -31,7 +29,7 @@
 
             node2nix = pkgs.haskell.lib.justStaticExecutables package;
 
-            app = { type = "app"; program = "${node2nix}/bin/node2nix"; };
+            app = { type = "app"; program = "${node2nix}/bin/node2nix-hs"; };
 
             devShell = package.env;
 
@@ -52,7 +50,7 @@
 
               checks = mkChecks {
                 "lint-nix"     = "${lint}/bin/lint ${./.}";
-                "lint-haskell" = "${pkgs.hlint}/bin/hlint ${./.}";
+                "lint-haskell" = "${pkgs.hlint}/bin/hlint --ignore-glob=${./.}/src/NodeEnv.hs ${./.}";
               };
 
               apps.lint = {

@@ -2,7 +2,7 @@ module Main
   ( main
   ) where
 
-import           Node2nixHs (projectName)
+import           CLI
 
 main :: IO ()
-main = putStrLn ("Executable for " ++ projectName)
+main = readOptions >>= processLockFile

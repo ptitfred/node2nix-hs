@@ -20,7 +20,10 @@ common common-options
   build-depends:       base ^>= 4.16.4.0
                      , relude
                      , hnix
-                     , serialise
+                     , text
+                     , aeson
+                     , parsec
+                     , containers
 
   mixins:              base hiding (Prelude)
                      , relude (Relude as Prelude)
@@ -49,7 +52,10 @@ common common-options
 library
   import:              common-options
   hs-source-dirs:      src
-  exposed-modules:     Node2nixHs
+  exposed-modules:     CLI
+                     , NodeEnv
+                     , Node2nixHs
+                     , PackageLock
 
 executable node2nix-hs
   import:              common-options

@@ -9,12 +9,11 @@ module CLI
   , readOptions
   ) where
 
-import           Data.Aeson  (eitherDecodeFileStrict)
 import           Nix         hiding (Options, defaultOptions)
 import           Nix.TH      (nix)
 import           Node2nixHs  (fromPackageLock)
 import           NodeEnv     (nodeEnv)
-import           PackageLock (PackageLock)
+import           PackageLock (PackageLock, loadPackageLock)
 
 processLockFile :: Options -> IO ()
 processLockFile options = do
@@ -27,7 +26,7 @@ readPackageLock :: IO PackageLock
 readPackageLock =
   let handleError s =
         die $ "Error while parsing the package-lock.json file: '" <> s <> "'"
-   in either handleError pure =<< eitherDecodeFileStrict "./package-lock.json"
+   in either handleError pure =<< loadPackageLock "./package-lock.json"
 
 saveResult :: FilePath -> PackageLock -> IO ()
 saveResult file = writeNixExpr file. fromPackageLock

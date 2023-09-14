@@ -24,6 +24,7 @@ common common-options
                      , aeson
                      , parsec
                      , containers
+                     , filepath
 
   mixins:              base hiding (Prelude)
                      , relude (Relude as Prelude)

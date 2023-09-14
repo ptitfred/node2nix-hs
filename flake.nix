@@ -14,7 +14,7 @@
         mkHaskellOverlay []
           (final: _:
             {
-              node2nix = final.callCabal2nix "node2nix" ./. {};
+              node2nix-hs = final.callCabal2nix "node2nix-hs" ./. {};
             }
           );
 
@@ -25,11 +25,11 @@
             previous-pkgs = import previous { inherit system; };
             lint = previous-pkgs.callPackage ./lint.nix {};
 
-            package = pkgs.haskellPackages.node2nix;
+            package = pkgs.haskellPackages.node2nix-hs;
 
-            node2nix = pkgs.haskell.lib.justStaticExecutables package;
+            node2nix-hs = pkgs.haskell.lib.justStaticExecutables package;
 
-            app = { type = "app"; program = "${node2nix}/bin/node2nix-hs"; };
+            app = { type = "app"; program = "${node2nix-hs}/bin/node2nix-hs"; };
 
             devShell = package.env;
 
@@ -41,7 +41,7 @@
 
             mkChecks = pkgs.lib.attrsets.mapAttrs mkCheck;
          in {
-              packages = { default = node2nix; };
+              packages = { inherit node2nix-hs; default = node2nix-hs; };
               apps = { default = app; };
               devShells = {
                 default = devShell;
@@ -60,5 +60,7 @@
             }
       );
 
-  in forEachSystems;
+      overlay = _: prev: { inherit (forEachSystems.packages.${prev.system}) node2nix-hs; };
+
+  in forEachSystems // { overlays.default = overlay; };
 }

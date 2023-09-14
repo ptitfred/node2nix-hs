@@ -133,7 +133,7 @@ fromPackageLock :: PackageLock -> NExpr
 fromPackageLock = uncurry nodePackages . (definitionFromPackageLock &&& sourcesFromPackageLock)
 
 definitionFromPackageLock :: PackageLock -> PackageDefinition
-definitionFromPackageLock PackageLock { name, packages } =
+definitionFromPackageLock PackageLock { name, packages, src } =
   let mkDep (depName, Package{ version }) =
         let deps = selectRecursiveDependencies depName packages
             qn = QName (depName <> "-" <> version)
@@ -142,7 +142,7 @@ definitionFromPackageLock PackageLock { name, packages } =
             else RecursiveDependency qn (mkDep <$> selectRootPackages deps)
    in PackageDefinition
         { packageName  = name
-        , src          = "./."
+        , src
         , dependencies = mkDep <$> selectRootPackages packages
         }
 
@@ -198,28 +198,3 @@ nodePackages packageDefinition sources =
           , "nodeDependencies" $= "nodeEnv" @. "buildNodeDependencies" @@ nodeDependenciesArgs
           ]
    in mkFunction topLevelParams (mkLets bindings body)
-
--- body :: NExpr
--- body =
---   [nix|
---     { nodeEnv, fetchurl, fetchgit, nix-gitignore, stdenv, lib, globalBuildInputs ? [] }:
---     {
---       args = args;
---       sources = sources;
---       tarball = nodeEnv.buildNodeSourceDist args;
---       package = nodeEnv.buildNodePackage args;
---       shell = nodeEnv.buildNodeShell args;
---       nodeDependencies = nodeEnv.buildNodeDependencies (lib.overrideExisting args {
---         src = stdenv.mkDerivation {
---           name = args.name + "-package-json";
---           src = nix-gitignore.gitignoreSourcePure [
---             "*"
---             "!package.json"
---             "!package-lock.json"
---           ] args.src;
---           dontBuild = true;
---           installPhase = "mkdir -p $out; cp -r ./* $out;";
---         };
---       });
---     }
---   |]

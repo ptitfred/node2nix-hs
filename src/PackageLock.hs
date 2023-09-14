@@ -9,7 +9,8 @@
 {-# LANGUAGE TupleSections              #-}
 
 module PackageLock
-  ( PackageLock(..)
+  ( loadPackageLock
+  , PackageLock(..)
   , Packages
   , PackageKey
   , packageNameFromPackageKey
@@ -23,6 +24,7 @@ import           Data.Aeson
 import           Data.Aeson.Types   (parseMaybe)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict    as M
+import           System.FilePath    (takeDirectory)
 import           Text.Parsec        (ParsecT, anyChar, choice, eof, many1,
                                      manyTill, runParser, string, try)
 
@@ -31,9 +33,17 @@ data PackageLock =
     { name            :: Text
     , lockfileVersion :: Int
     , packages        :: Packages
+    , src             :: FilePath
     } deriving stock (Show)
 
-instance FromJSON PackageLock where
+loadPackageLock :: FilePath -> IO (Either String PackageLock)
+loadPackageLock file =
+  let realise (UnrealisedPackageLock unrealised) = unrealised (takeDirectory file)
+   in fmap realise <$> eitherDecodeFileStrict file
+
+newtype UnrealisedPackageLock = UnrealisedPackageLock (FilePath -> PackageLock)
+
+instance FromJSON UnrealisedPackageLock where
   parseJSON = withObject "PackageLock" $ \o -> do
     lockfileVersion <- o .: "lockfileVersion"
     if lockfileVersion == 1
@@ -41,7 +51,7 @@ instance FromJSON PackageLock where
     else do
       name     <- o .: "name"
       packages <- interpretKeys <$> o .: "packages"
-      pure PackageLock{..}
+      pure $ UnrealisedPackageLock (\src -> PackageLock{..})
 
 newtype PackageKey = PackageKey (NonEmpty Text) deriving newtype (Show, Eq, Ord, Hashable, FromJSON)
 

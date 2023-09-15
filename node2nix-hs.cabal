@@ -1,6 +1,6 @@
 cabal-version:       3.0
 name:                node2nix-hs
-version:             0.0.0.0
+version:             0.0.1.0
 synopsis:            Drop&replace reimplementation of node2nix
 description:
     Drop&replace reimplementation of node2nix.

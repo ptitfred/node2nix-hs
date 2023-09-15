@@ -9,7 +9,7 @@ import           Options.Applicative
 
 readOptions :: IO Options
 readOptions =
-  execParser (info (optionsParser <**> helper) (fullDesc <> progDesc "node2nix alternative implementation supporting nodeJS 18+"))
+  execParser (info (optionsParser <**> helper <**> simpleVersioner "v0.0.1.0") (fullDesc <> progDesc "node2nix alternative implementation supporting nodeJS 18+"))
 
 optionsParser :: Parser Options
 optionsParser =
@@ -42,9 +42,9 @@ nodeJSVersionParser =
 
 data Options =
   Options
-    { paths              :: Paths
-    , noCopyNodeEnv      :: Bool
-    , nodeJSVersion      :: NodeJSVersion
+    { paths         :: Paths
+    , noCopyNodeEnv :: Bool
+    , nodeJSVersion :: NodeJSVersion
     }
 
 data NodeJSVersion
@@ -59,3 +59,9 @@ data Paths =
     , nodeEnvFile     :: FilePath
     , packageLockFile :: FilePath
     }
+
+simpleVersioner :: String -- ^ Version string to be shown
+                -> Parser (a -> a)
+simpleVersioner version =
+  infoOption version
+    (long "version" <> short 'v' <> help "Show version information")

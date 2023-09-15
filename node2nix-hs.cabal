@@ -25,6 +25,7 @@ common common-options
                      , parsec
                      , containers
                      , filepath
+                     , optparse-applicative
 
   mixins:              base hiding (Prelude)
                      , relude (Relude as Prelude)
@@ -54,6 +55,7 @@ library
   import:              common-options
   hs-source-dirs:      src
   exposed-modules:     CLI
+                     , CLI.Options
                      , NodeEnv
                      , Node2nixHs
                      , PackageLock

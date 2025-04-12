@@ -31,7 +31,7 @@ pathsParser =
             <*> packageLockOption
 
 noCopyNodeEnvParser :: Parser Bool
-noCopyNodeEnvParser = not <$> switch (long "no-copy-node-env" <> help "Do not create a copy of the Nix expression that builds NPM packages")
+noCopyNodeEnvParser = switch (long "no-copy-node-env" <> help "Do not create a copy of the Nix expression that builds NPM packages")
 
 nodeJSVersionParser :: Parser NodeJSVersion
 nodeJSVersionParser =
